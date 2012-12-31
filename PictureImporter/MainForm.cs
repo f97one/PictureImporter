@@ -18,7 +18,19 @@ namespace PictureImporter
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            // 出力フォルダの初期値を
+            textBoxExportDir.Text = GetMyPicturePath();
+        }
 
+        // ユーザーの[マイピクチャ]を返す
+        private string GetMyPicturePath()
+        {
+            string myPciturePath = "";
+
+            // スペシャルフォルダの「マイピクチャ」を取得する
+            myPciturePath = System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+
+            return myPciturePath;
         }
 
     }
