@@ -115,6 +115,7 @@
             this.checkBoxMyPicture.TabIndex = 6;
             this.checkBoxMyPicture.Text = "[マイ ピクチャ](&P)";
             this.checkBoxMyPicture.UseVisualStyleBackColor = true;
+            this.checkBoxMyPicture.CheckedChanged += new System.EventHandler(this.checkBoxMyPicture_CheckedChanged);
             // 
             // buttonExec
             // 

@@ -33,5 +33,25 @@ namespace PictureImporter
             return myPciturePath;
         }
 
+        private void checkBoxMyPicture_CheckedChanged(object sender, EventArgs e)
+        {
+            // チェックボックスがはずれている場合は、
+            // 出力先フォルダのテキストボックスをクリアし、
+            // テキストボックスに入力できるようにする。
+            //   実際には、自身の状態で判断ができない(!)ようので、
+            //   操作する出力先テキストボックスの状態で判断するように
+            //   している(^^;)。
+            if (!textBoxExportDir.Enabled)
+            {
+                textBoxExportDir.Text = "";
+                textBoxExportDir.Enabled = true;
+            }
+            else
+            {
+                textBoxExportDir.Text = GetMyPicturePath();
+                textBoxExportDir.Enabled = false;
+            }
+        }
+
     }
 }
