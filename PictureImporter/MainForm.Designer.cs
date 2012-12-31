@@ -73,6 +73,7 @@
             this.buttonImportBrowse.TabIndex = 2;
             this.buttonImportBrowse.Text = "参照...(&I)";
             this.buttonImportBrowse.UseVisualStyleBackColor = true;
+            this.buttonImportBrowse.Click += new System.EventHandler(this.buttonImportBrowse_Click);
             // 
             // buttonExportBrowse
             // 
@@ -83,6 +84,7 @@
             this.buttonExportBrowse.TabIndex = 3;
             this.buttonExportBrowse.Text = "参照...(&O)";
             this.buttonExportBrowse.UseVisualStyleBackColor = true;
+            this.buttonExportBrowse.Click += new System.EventHandler(this.buttonExportBrowse_Click);
             // 
             // textBoxExportDir
             // 
