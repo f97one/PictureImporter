@@ -100,5 +100,77 @@ namespace PictureImporter
             // 配列の最初のみ返す
             return drives[0];
         }
-    }
+
+        /// http://jeanne.wankuma.com/tips/csharp/directory/getfilesmostdeep.html
+        /// ---------------------------------------------------------------------------------------
+        /// <summary>
+        ///     指定した検索パターンに一致するファイルを最下層まで検索しすべて返します。</summary>
+        /// <param name="stRootPath">
+        ///     検索を開始する最上層のディレクトリへのパス。</param>
+        /// <param name="stPattern">
+        ///     パス内のファイル名と対応させる検索文字列。</param>
+        /// <returns>
+        ///     検索パターンに一致したすべてのファイルパス。</returns>
+        /// ---------------------------------------------------------------------------------------
+        public static string[] GetFilesMostDeep(string stRootPath, string stPattern)
+        {
+            System.Collections.Specialized.StringCollection hStringCollection = (
+                new System.Collections.Specialized.StringCollection()
+            );
+
+            // このディレクトリ内のすべてのファイルを検索する
+            foreach (string stFilePath in System.IO.Directory.GetFiles(stRootPath, stPattern))
+            {
+                hStringCollection.Add(stFilePath);
+            }
+
+            // このディレクトリ内のすべてのサブディレクトリを検索する (再帰)
+            foreach (string stDirPath in System.IO.Directory.GetDirectories(stRootPath))
+            {
+                string[] stFilePathes = GetFilesMostDeep(stDirPath, stPattern);
+
+                // 条件に合致したファイルがあった場合は、ArrayList に加える
+                if (stFilePathes != null)
+                {
+                    hStringCollection.AddRange(stFilePathes);
+                }
+            }
+
+            // StringCollection を 1 次元の String 配列にして返す
+            string[] stReturns = new string[hStringCollection.Count];
+            hStringCollection.CopyTo(stReturns, 0);
+
+            return stReturns;
+        }
+
+		// ラジオボタンの設定で上書きを許可するか否かを判断する
+		private bool canOverwrite()
+		{
+			bool ret = false;
+
+			if (radioButtonNotCopy.Checked) ret = false;
+			if (radioButtonOverwrite.Checked) ret = true;
+
+			return ret;
+		}
+		
+		// ファイルをコピーする
+		private void CopyImageFiles(string inputFile, string outputDir, bool overwriteFlag)
+		{
+
+		}
+
+		// yyyy_MM_dd形式のディレクトリがなければ作成する
+		private void MkDateDir(DateTime makeDirDate, string prefixDir)
+		{
+			// 日付フォーマットをyyyy_MM_ddに変更する
+			string dateDir = makeDirDate.ToString(@"yyyy_MM_dd");
+
+			// [PREFIX]\yyyy_MM_dd ディレクトリがなければ作成する
+			if (!Directory.Exists(prefixDir + "\\" + dateDir))
+			{
+				Directory.CreateDirectory(prefixDir + "\\" + dateDir);
+			}
+		}
+	}
 }
