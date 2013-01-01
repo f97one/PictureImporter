@@ -6,6 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using System.Management;
+using System.Management.Instrumentation;
 
 namespace PictureImporter
 {
@@ -21,6 +24,11 @@ namespace PictureImporter
             // 出力フォルダの初期値を取得してテキストボックスと出力ダイアログに入れる
             textBoxExportDir.Text = GetMyPicturePath();
             folderBrowserDialogExport.SelectedPath = GetMyPicturePath();
+
+            // 入力フォルダの初期値に、「最初に見つかったリムーバブルドライブ」を
+            // セットする
+            textBoxImportDir.Text = GetFirstRemoveableDrive();
+            folderBrowserDialogImport.SelectedPath = GetFirstRemoveableDrive();
         }
 
         // ユーザーの[マイピクチャ]を返す
@@ -72,5 +80,25 @@ namespace PictureImporter
             }
         }
 
+        // 接続されているリムーバブルディスクのうち一番若いドライブレターを返す
+        private string GetFirstRemoveableDrive()
+        {
+            // リムーバブルドライブの一覧だけをあらかじめ取得する
+            var removableDrives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Removable);
+
+            // D～Zまでの23個分の配列をあらかじめ確保しておく
+            string[] drives = new string[23];
+            int idxCount = 0;
+
+            // 配列にドライブレターを一つずつ格納する
+            foreach (DriveInfo d in removableDrives)
+            {
+                drives[idxCount] = d.Name;
+                idxCount++;
+            }
+
+            // 配列の最初のみ返す
+            return drives[0];
+        }
     }
 }
