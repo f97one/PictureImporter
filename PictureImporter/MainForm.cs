@@ -155,9 +155,34 @@ namespace PictureImporter
 		}
 		
 		// ファイルをコピーする
-		private void CopyImageFiles(string inputFile, string outputDir, bool overwriteFlag)
+		private bool CopyImageFiles(string inputFile, string outputDir, bool overwriteFlag)
 		{
+			// ファイルコピーの結果をしめすフラグ
+			bool result = false;
 
+			// コピーするファイルの名前だけを取得
+			string filenameBody = Path.GetFileName(inputFile);
+
+			// コピー元ファイルの最終更新日を取得して、ディレクトリを作る
+			DateTime lastModDate = File.GetLastWriteTime(inputFile);
+			MkDateDir(lastModDate, outputDir);
+
+			string outputPath = outputDir + "\\" + lastModDate.ToString(@"yyyy_MM_dd") + "\\" + filenameBody;
+			
+			// ファイルをコピーする
+			try
+			{
+				File.Copy(@inputFile, @outputPath, overwriteFlag);
+				
+				result = true;
+			}
+			catch (Exception)
+			{
+				result = false;
+				//throw;
+			}
+
+			return result;
 		}
 
 		// yyyy_MM_dd形式のディレクトリがなければ作成する
