@@ -127,6 +127,7 @@
 			this.buttonExec.TabIndex = 7;
 			this.buttonExec.Text = "コピー開始(&E)";
 			this.buttonExec.UseVisualStyleBackColor = true;
+			this.buttonExec.Click += new System.EventHandler(this.buttonExec_Click);
 			// 
 			// groupBoxTreatSameFile
 			// 

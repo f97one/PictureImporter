@@ -197,5 +197,43 @@ namespace PictureImporter
 				Directory.CreateDirectory(prefixDir + "\\" + dateDir);
 			}
 		}
+
+		private void buttonExec_Click(object sender, EventArgs e)
+		{
+			// 入出力ディレクトリの取得
+			string inDirBase = textBoxImportDir.Text;	// 入力フォルダ
+			string outDirBase = textBoxExportDir.Text;	// 出力フォルダ
+
+			// コピーするファイルの一覧を取得
+			string[] arrayCopyFiles = GetFilesMostDeep(inDirBase, "*.jpg");
+
+			int successFiles = 0;
+			int failedFiles = 0;
+
+
+			// ファイルをコピーする
+			foreach (string copyFile in arrayCopyFiles)
+			{
+				// ファイルコピーの結果をbooleanで取得する
+				bool result = CopyImageFiles(copyFile, outDirBase, canOverwrite());
+
+				// コピー成否をカウントする
+				if (result)
+				{
+					successFiles++;
+				}
+				else
+				{
+					failedFiles++;
+				}
+			}
+
+			// ファイルコピー結果をポップアップで知らせる
+			string showMsg="ファイルをコピーしました！" +"\r\n"+
+				"　成功ファイル数：" + successFiles.ToString() +"\r\n"+
+				"　失敗ファイル数：" +failedFiles.ToString();
+
+			MessageBox.Show(showMsg, "Picture Importer"); 
+		}
 	}
 }
