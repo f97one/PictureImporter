@@ -18,13 +18,14 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
+[Bb]in/
 [Dd]ebug*/
 *.lib
 *.sbr
 obj/
 [Rr]elease*/
 _ReSharper*/
+[Pp]ublish/
 #ignore thumbnails created by windows
 #Ignore files build by Visual Studio
 [Tt]est[Rr]esult*
