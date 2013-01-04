@@ -77,6 +77,7 @@
 			// buttonExportBrowse
 			// 
 			this.buttonExportBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonExportBrowse.Enabled = false;
 			this.buttonExportBrowse.Location = new System.Drawing.Point(425, 38);
 			this.buttonExportBrowse.Name = "buttonExportBrowse";
 			this.buttonExportBrowse.Size = new System.Drawing.Size(75, 23);
