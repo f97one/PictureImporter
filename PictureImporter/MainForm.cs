@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
-using System.Management;
-using System.Management.Instrumentation;
 
 namespace PictureImporter
 {
@@ -83,18 +76,24 @@ namespace PictureImporter
         // 接続されているリムーバブルディスクのうち一番若いドライブレターを返す
         private string GetFirstRemoveableDrive()
         {
-            // リムーバブルドライブの一覧だけをあらかじめ取得する
+            // リムーバブルドライブの一覧だけを、LINQであらかじめ取得する
             var removableDrives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Removable);
 
-            // D～Zまでの23個分の配列をあらかじめ確保しておく
-            string[] drives = new string[23];
+            // ダイレクトにToArray()せず、いったん格納用配列を初期化する
+            string[] drives = new string[removableDrives.Count() + 1];
+
             int idxCount = 0;
 
             // 配列にドライブレターを一つずつ格納する
+			// A:\とB:\はFDDなので無視する
+			// （両方とも否定なのでAND条件にしている）
             foreach (DriveInfo d in removableDrives)
             {
-                drives[idxCount] = d.Name;
-                idxCount++;
+				if (d.Name != "A:\\" && d.Name != "B:\\")
+				{
+					drives[idxCount] = d.Name;
+					idxCount++;
+				}
             }
 
             // 配列の最初のみ返す
