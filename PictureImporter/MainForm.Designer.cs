@@ -41,6 +41,8 @@
 			this.radioButtonOverwrite = new System.Windows.Forms.RadioButton();
 			this.folderBrowserDialogImport = new System.Windows.Forms.FolderBrowserDialog();
 			this.folderBrowserDialogExport = new System.Windows.Forms.FolderBrowserDialog();
+			this.labelOperatedFiles = new System.Windows.Forms.Label();
+			this.labelNowOperating = new System.Windows.Forms.Label();
 			this.groupBoxTreatSameFile.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -136,7 +138,7 @@
 			this.groupBoxTreatSameFile.Controls.Add(this.radioButtonOverwrite);
 			this.groupBoxTreatSameFile.Location = new System.Drawing.Point(15, 87);
 			this.groupBoxTreatSameFile.Name = "groupBoxTreatSameFile";
-			this.groupBoxTreatSameFile.Size = new System.Drawing.Size(137, 67);
+			this.groupBoxTreatSameFile.Size = new System.Drawing.Size(114, 67);
 			this.groupBoxTreatSameFile.TabIndex = 8;
 			this.groupBoxTreatSameFile.TabStop = false;
 			this.groupBoxTreatSameFile.Text = "同名ファイルの処理";
@@ -163,11 +165,32 @@
 			this.radioButtonOverwrite.Text = "上書きする(&W)";
 			this.radioButtonOverwrite.UseVisualStyleBackColor = true;
 			// 
+			// labelOperatedFiles
+			// 
+			this.labelOperatedFiles.AutoSize = true;
+			this.labelOperatedFiles.Location = new System.Drawing.Point(352, 135);
+			this.labelOperatedFiles.Name = "labelOperatedFiles";
+			this.labelOperatedFiles.Size = new System.Drawing.Size(59, 12);
+			this.labelOperatedFiles.TabIndex = 9;
+			this.labelOperatedFiles.Text = "999999999";
+			this.labelOperatedFiles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// labelNowOperating
+			// 
+			this.labelNowOperating.AutoSize = true;
+			this.labelNowOperating.Location = new System.Drawing.Point(299, 135);
+			this.labelNowOperating.Name = "labelNowOperating";
+			this.labelNowOperating.Size = new System.Drawing.Size(47, 12);
+			this.labelNowOperating.TabIndex = 9;
+			this.labelNowOperating.Text = "処理中：";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(512, 165);
+			this.Controls.Add(this.labelNowOperating);
+			this.Controls.Add(this.labelOperatedFiles);
 			this.Controls.Add(this.groupBoxTreatSameFile);
 			this.Controls.Add(this.buttonExec);
 			this.Controls.Add(this.checkBoxMyPicture);
@@ -203,6 +226,8 @@
 		private System.Windows.Forms.RadioButton radioButtonNotCopy;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialogImport;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialogExport;
+		private System.Windows.Forms.Label labelOperatedFiles;
+		private System.Windows.Forms.Label labelNowOperating;
     }
 }
 
