@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
+using System.Collections.Specialized;
 
 namespace PictureImporter
 {
@@ -22,6 +24,9 @@ namespace PictureImporter
             // セットする
             textBoxImportDir.Text = GetFirstRemoveableDrive();
             folderBrowserDialogImport.SelectedPath = GetFirstRemoveableDrive();
+
+			// 処理中ファイルを表示するラベルの文字を消去
+			labelOperatedFiles.Text = "";
         }
 
         // ユーザーの[マイピクチャ]を返す
@@ -117,18 +122,20 @@ namespace PictureImporter
         /// ---------------------------------------------------------------------------------------
         public static string[] GetFilesMostDeep(string stRootPath, string stPattern)
         {
-            System.Collections.Specialized.StringCollection hStringCollection = (
-                new System.Collections.Specialized.StringCollection()
-            );
+			// ファイルリスト取得開始をデバッグ出力
+			Debug.Print(DateTime.Now + " Started to get files recursivery.");
+
+            StringCollection hStringCollection = new StringCollection();
 
             // このディレクトリ内のすべてのファイルを検索する
-            foreach (string stFilePath in System.IO.Directory.GetFiles(stRootPath, stPattern))
+            foreach (string stFilePath in Directory.GetFiles(stRootPath, stPattern))
             {
                 hStringCollection.Add(stFilePath);
+				Debug.Print(DateTime.Now + " Found image file, Filename = " + stFilePath);
             }
 
             // このディレクトリ内のすべてのサブディレクトリを検索する (再帰)
-            foreach (string stDirPath in System.IO.Directory.GetDirectories(stRootPath))
+            foreach (string stDirPath in Directory.GetDirectories(stRootPath))
             {
                 string[] stFilePathes = GetFilesMostDeep(stDirPath, stPattern);
 
@@ -142,6 +149,9 @@ namespace PictureImporter
             // StringCollection を 1 次元の String 配列にして返す
             string[] stReturns = new string[hStringCollection.Count];
             hStringCollection.CopyTo(stReturns, 0);
+
+			// ファイルリスト取得終了をデバッグ出力
+			Debug.Print(DateTime.Now + " Finished to get files recursivery.");
 
             return stReturns;
         }
@@ -198,6 +208,8 @@ namespace PictureImporter
 			if (!Directory.Exists(prefixDir + "\\" + dateDir))
 			{
 				Directory.CreateDirectory(prefixDir + "\\" + dateDir);
+				// 
+				Debug.Print(DateTime.Now + " Created directory, path = " + prefixDir + "\\" + dateDir);
 			}
 		}
 
@@ -210,13 +222,20 @@ namespace PictureImporter
 			// コピーするファイルの一覧を取得
 			string[] arrayCopyFiles = GetFilesMostDeep(inDirBase, "*.jpg");
 
+			// 処理成功ファイル数と処理失敗ファイル数を格納する変数を初期化
 			int successFiles = 0;
 			int failedFiles = 0;
 
-
 			// ファイルをコピーする
+			Debug.Print(DateTime.Now + " Started to copy image files.");
+
 			foreach (string copyFile in arrayCopyFiles)
 			{
+				// 処理中ファイル数を表示
+				//   処理中なので、処理に入った後の結果の合計より1少ないはずなので、
+				//   表示は1加算した状態にする
+				labelOperatedFiles.Text = (successFiles + failedFiles + 1).ToString();
+
 				// ファイルコピーの結果をbooleanで取得する
 				bool result = CopyImageFiles(copyFile, outDirBase, canOverwrite());
 
@@ -230,6 +249,8 @@ namespace PictureImporter
 					failedFiles++;
 				}
 			}
+
+			Debug.Print(DateTime.Now + " Finished to copy image files.");
 
 			// ファイルコピー結果をポップアップで知らせる
 			string showMsg="ファイルをコピーしました！" +"\r\n"+
