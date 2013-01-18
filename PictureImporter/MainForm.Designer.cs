@@ -200,6 +200,7 @@
 			this.Controls.Add(this.buttonImportBrowse);
 			this.Controls.Add(this.textBoxImportDir);
 			this.Controls.Add(this.label1);
+			this.DoubleBuffered = true;
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "Picture Importer";

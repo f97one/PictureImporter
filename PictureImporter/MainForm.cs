@@ -9,6 +9,8 @@ namespace PictureImporter
 {
     public partial class MainForm : Form
     {
+		int copiedFiles;
+
         public MainForm()
         {
             InitializeComponent();
@@ -100,8 +102,12 @@ namespace PictureImporter
             {
 				if (d.Name != "A:\\" && d.Name != "B:\\")
 				{
-					drives[idxCount] = d.Name;
-					idxCount++;
+					// ドライブが使用可能な場合のみ、配列に格納する
+					if (d.IsReady)
+					{
+						drives[idxCount] = d.Name;
+						idxCount++;
+					}
 				}
             }
 
@@ -124,7 +130,7 @@ namespace PictureImporter
         {
 			// ファイルリスト取得開始をデバッグ出力
 			Debug.Print(DateTime.Now + " Started to get files recursivery.");
-
+		
             StringCollection hStringCollection = new StringCollection();
 
             // このディレクトリ内のすべてのファイルを検索する
@@ -173,6 +179,9 @@ namespace PictureImporter
 			// ファイルコピーの結果をしめすフラグ
 			bool result = false;
 
+			copiedFiles++;
+			labelOperatedFiles.Text = copiedFiles.ToString();
+
 			// コピーするファイルの名前だけを取得
 			string filenameBody = Path.GetFileName(inputFile);
 
@@ -215,6 +224,8 @@ namespace PictureImporter
 
 		private void buttonExec_Click(object sender, EventArgs e)
 		{
+			copiedFiles = 0;
+
 			// 入出力ディレクトリの取得
 			string inDirBase = textBoxImportDir.Text;	// 入力フォルダ
 			string outDirBase = textBoxExportDir.Text;	// 出力フォルダ
@@ -234,7 +245,7 @@ namespace PictureImporter
 				// 処理中ファイル数を表示
 				//   処理中なので、処理に入った後の結果の合計より1少ないはずなので、
 				//   表示は1加算した状態にする
-				labelOperatedFiles.Text = (successFiles + failedFiles + 1).ToString();
+				//labelOperatedFiles.Text = (successFiles + failedFiles + 1).ToString();
 
 				// ファイルコピーの結果をbooleanで取得する
 				bool result = CopyImageFiles(copyFile, outDirBase, canOverwrite());
