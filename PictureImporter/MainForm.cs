@@ -9,7 +9,10 @@ namespace PictureImporter
 {
     public partial class MainForm : Form
     {
-		int copiedFiles;
+		private int copiedFiles;
+
+        private int succesFilesCount;
+        private int failedFilesCount;
 
         public MainForm()
         {
@@ -84,35 +87,17 @@ namespace PictureImporter
             }
         }
 
-        // 接続されているリムーバブルディスクのうち一番若いドライブレターを返す
+        /// <summary>
+        /// 接続されているリムーバブルディスクのうち、一番若いドライブレターを返す。
+        /// </summary>
+        /// <returns>一番若いドライブレターのリムーバブルディスク、見つからないときはnull</returns>
         private string GetFirstRemoveableDrive()
         {
-            // リムーバブルドライブの一覧だけを、LINQであらかじめ取得する
-            var removableDrives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Removable);
+            var removable = DriveInfo.GetDrives()
+                                .Where(d => d.DriveType == DriveType.Removable)
+                                .FirstOrDefault(drv => (drv.Name != "A:\\" && drv.Name != "B:\\"));
 
-            // ダイレクトにToArray()せず、いったん格納用配列を初期化する
-            string[] drives = new string[removableDrives.Count() + 1];
-
-            int idxCount = 0;
-
-            // 配列にドライブレターを一つずつ格納する
-			// A:\とB:\はFDDなので無視する
-			// （両方とも否定なのでAND条件にしている）
-            foreach (DriveInfo d in removableDrives)
-            {
-				if (d.Name != "A:\\" && d.Name != "B:\\")
-				{
-					// ドライブが使用可能な場合のみ、配列に格納する
-					if (d.IsReady)
-					{
-						drives[idxCount] = d.Name;
-						idxCount++;
-					}
-				}
-            }
-
-            // 配列の最初のみ返す
-            return drives[0];
+            return removable == null ? null : removable.Name;
         }
 
         /// http://jeanne.wankuma.com/tips/csharp/directory/getfilesmostdeep.html
@@ -180,7 +165,7 @@ namespace PictureImporter
 			bool result = false;
 
 			copiedFiles++;
-			labelOperatedFiles.Text = copiedFiles.ToString();
+			//labelOperatedFiles.Text = copiedFiles.ToString();
 
 			// コピーするファイルの名前だけを取得
 			string filenameBody = Path.GetFileName(inputFile);
@@ -223,52 +208,96 @@ namespace PictureImporter
 		}
 
 		private void buttonExec_Click(object sender, EventArgs e)
-		{
-			copiedFiles = 0;
+        {
+            // BackgroundWorker動作中は無視する
+            if (backgroundWorker1.IsBusy)
+            {
+                return;
+            }
 
-			// 入出力ディレクトリの取得
-			string inDirBase = textBoxImportDir.Text;	// 入力フォルダ
-			string outDirBase = textBoxExportDir.Text;	// 出力フォルダ
+            ChangeUILockState(false);
 
-			// コピーするファイルの一覧を取得
-			string[] arrayCopyFiles = GetFilesMostDeep(inDirBase, "*.jpg");
+            labelOperatedFiles.Text = "0";
 
-			// 処理成功ファイル数と処理失敗ファイル数を格納する変数を初期化
-			int successFiles = 0;
-			int failedFiles = 0;
+            backgroundWorker1.RunWorkerAsync();
 
-			// ファイルをコピーする
-			Debug.Print(DateTime.Now + " Started to copy image files.");
+        }
 
-			foreach (string copyFile in arrayCopyFiles)
-			{
-				// 処理中ファイル数を表示
-				//   処理中なので、処理に入った後の結果の合計より1少ないはずなので、
-				//   表示は1加算した状態にする
-				//labelOperatedFiles.Text = (successFiles + failedFiles + 1).ToString();
+        private static void RaiseResult(int successFiles, int failedFiles)
+        {
+            // ファイルコピー結果をポップアップで知らせる
+            string showMsg = "ファイルをコピーしました！" + Environment.NewLine +
+                "　成功ファイル数：" + successFiles.ToString() + Environment.NewLine +
+                "　失敗ファイル数：" + failedFiles.ToString();
 
-				// ファイルコピーの結果をbooleanで取得する
-				bool result = CopyImageFiles(copyFile, outDirBase, canOverwrite());
+            MessageBox.Show(showMsg, "Picture Importer");
+        }
 
-				// コピー成否をカウントする
-				if (result)
-				{
-					successFiles++;
-				}
-				else
-				{
-					failedFiles++;
-				}
-			}
+        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            copiedFiles = 0;
 
-			Debug.Print(DateTime.Now + " Finished to copy image files.");
+            // 入出力ディレクトリの取得
+            string inDirBase = textBoxImportDir.Text;   // 入力フォルダ
+            string outDirBase = textBoxExportDir.Text;  // 出力フォルダ
 
-			// ファイルコピー結果をポップアップで知らせる
-			string showMsg="ファイルをコピーしました！" +"\r\n"+
-				"　成功ファイル数：" + successFiles.ToString() +"\r\n"+
-				"　失敗ファイル数：" +failedFiles.ToString();
+            // コピーするファイルの一覧を取得
+            string[] arrayCopyFiles = GetFilesMostDeep(inDirBase, "*.jpg");
 
-			MessageBox.Show(showMsg, "Picture Importer"); 
-		}
-	}
+            foreach (string copyFile in arrayCopyFiles)
+            {
+                // 処理中ファイル数を表示
+                //   処理中なので、処理に入った後の結果の合計より1少ないはずなので、
+                //   表示は1加算した状態にする
+                //labelOperatedFiles.Text = (successFiles + failedFiles + 1).ToString();
+
+                // ファイルコピーの結果をbooleanで取得する
+                bool result = CopyImageFiles(copyFile, outDirBase, canOverwrite());
+
+                // コピー成否をカウントする
+                if (result)
+                {
+                    succesFilesCount++;
+                }
+                else
+                {
+                    failedFilesCount++;
+                }
+
+                copiedFiles = succesFilesCount + failedFilesCount;
+
+                backgroundWorker1.ReportProgress((int)(copiedFiles / arrayCopyFiles.Count()));
+            }
+
+            Debug.Print(DateTime.Now + " Finished to copy image files.");
+
+        }
+
+        private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            labelOperatedFiles.Text = e.ProgressPercentage.ToString();
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            RaiseResult(succesFilesCount, failedFilesCount);
+
+            ChangeUILockState(true);
+        }
+
+        /// <summary>
+        /// コントロールのロック状態を変更する。
+        /// </summary>
+        /// <param name="lockState">使用可とする場合true、使用不可とする場合false</param>
+        private void ChangeUILockState(bool lockState)
+        {
+            textBoxImportDir.Enabled = lockState;
+            textBoxExportDir.Enabled = lockState;
+            buttonImportBrowse.Enabled = lockState;
+            buttonExportBrowse.Enabled = lockState;
+            checkBoxMyPicture.Enabled = lockState;
+            groupBoxTreatSameFile.Enabled = lockState;
+            buttonExec.Enabled = lockState;
+        }
+    }
 }
